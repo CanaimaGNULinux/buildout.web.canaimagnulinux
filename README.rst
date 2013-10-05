@@ -32,11 +32,11 @@ Crear un archivo ~/.buildout/default.cfg con lo siguiente:
   extends-cache = ~/.buildout/extends
 
  - download-cache: Directorio donde se almacenan los sources de los paquetes
-   descargados con los que se contruyen los paquetes python (eggs).
+   descargados con los que se construyen los paquetes python (eggs).
 
  - eggs-directory: Directorio donde se almacenan los paquetes python generados.
 
- - extends-cache: Directorio donde se almacenan archivos de configuracion (.cfg)
+ - extends-cache: Directorio donde se almacenan archivos de configuración (.cfg)
    que son descargados desde la red, generalmente por una clausula extends y que
    son utilizados cuando el buildout se ejecuta sin conexión (offline mode)
 
@@ -78,18 +78,27 @@ Puede acceder al sitio a través de la dirección http://127.0.0.1:8080/
 Entorno de pruebas (staging)
 ============================
 
-Ingresar al directorio donde se obtubo la copia del buildout:
+Ingresar al directorio donde se obtuvo la copia del buildout:
 
 .. code-block:: console
 
   $ cd ~/buildout.web.canaimagnulinux
 
-Una vez relacizado ese paso, ejecute los siguientes comandos:
+Una vez realizado ese paso, debe modificar el archivo **buildout.cfg** con el siguiente comando ::
 
-.. code-block:: console
-
-  $ python bootstrap.py -c staging.cfg
-  $ ./bin/buildout -c staging.cfg
+  $ vim buildout.cfg
+  
+Y este archivo debería lucir así::
+  
+  [buildout]
+  #extends = buildout.d/development.cfg
+  extends = buildout.d/staging.cfg
+  #extends = buildout.d/production.cfg
+  
+Luego inicie la construcción con el siguiente comando ::
+  
+  $ python bootstrap.py
+  $ ./bin/buildout -vvvvvvN
 
 Para iniciar la instancia del sitio Plone, ejecutar:
 
@@ -143,13 +152,21 @@ Acceder al usuario, clonar el repositorio y correr el bootstrap:
 Generar el buildout y lo ejecutarlo con el profile de producción según sea
 una instancia.
 
-Profile para maquinas de solo lectura o para encuestas.
+Una vez realizado ese paso, debe modificar el archivo **buildout.cfg** con el siguiente comando ::
 
-.. code-block:: console
-
-    $ python bootstrap.py -c production.cfg
-
-    $ bin/buildout -c production.cfg
+  $ vim buildout.cfg
+  
+Y este archivo debería lucir así::
+  
+  [buildout]
+  #extends = buildout.d/development.cfg
+  #extends = buildout.d/staging.cfg
+  extends = buildout.d/production.cfg
+  
+Luego inicie la construcción con el siguiente comando ::
+  
+  $ python bootstrap.py
+  $ ./bin/buildout -vvvvvvN
 
 Iniciar las instancias manualmente.
 
@@ -161,7 +178,7 @@ Actualizar la configuración de las servicios del SO:
  (haproxy, varnish y nginx).
 
 Ejecutar el siguiente comando desde un usuario que tenga los privilegios
-necesarios para utilzar sudo.
+necesarios para utilizar sudo.
 
 .. code-block:: console
 
