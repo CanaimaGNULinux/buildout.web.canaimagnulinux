@@ -1,0 +1,35 @@
+# .zopeskel configuration file for Buildout projects
+
+# This file can contain preferences for zopeskel.
+# To do so, uncomment the lines that look like:
+#    variable_name = Default Value
+
+[DEFAULT]
+# Expert Mode? (What question mode would you like? (easy/expert/all)?)
+expert_mode = easy
+
+# Version (Version number for project)
+version = 0.1
+
+# Author (Name of author for project)
+author = Leonardo J. Caballero G.
+
+# Author Email (Email of author for project)
+author_email = leonardoc@plone.org
+
+# Project URL (URL of the homepage for this project)
+url = http://about.me/macagua
+
+# Project License (Name of license for the project)
+license_name = GPL 2
+
+# Zip-Safe? (Can this project be used as a zipped egg? (true/false))
+zip_safe = False
+
+# Description (One-line description of the project)
+description = A Buildout configuration for Plone common projects
+
+# Keywords (List of keywords, space-separated)
+keywords = Buildout configuration Plone projects
+
+
