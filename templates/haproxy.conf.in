@@ -1,0 +1,89 @@
+# This is the default haproxy load balancing configuration. 
+# It uses will load balance four ZEO clients.
+# Note that haproxy.conf file is generated from haproxy.conf.in template file.
+
+global
+  log ${hosts:syslog} local6
+
+  # We manage this with supervisor
+  #  user ${users:zope}
+
+  maxconn  ${haproxy-settings:maxconn}
+  ulimit-n ${haproxy-settings:ulimit-n}
+
+  nbproc 1
+
+  # Run in non-daemon mode so that supervisor can keep control
+  #  daemon
+
+defaults
+  log global
+  mode http
+
+  # The zope instances have maxconn 1, and it is important that
+  # unused/idle connections are closed as soon as possible.
+  option httpclose
+
+  # Remove requests from the queue if people press stop button
+  option abortonclose
+
+  option httplog
+  #  option dontlognull
+  # Try to connect this many times on failure
+  retries 3
+
+  # If a client is bound to a particular backend but it goes down,
+  # send them to a different one
+  option redispatch
+  monitor-uri /haproxy-ping
+
+  timeout connect 7s
+  timeout queue   300s
+  timeout client  300s
+  timeout server  300s
+
+  # Enable status page at this URL, on the port HAProxy is bound to
+  stats enable
+  stats show-legends
+  stats uri /haproxy-stats
+  stats refresh 5s
+  stats realm Haproxy\ statistics
+  stats auth ${haproxy-settings:user}:${haproxy-settings:password}
+  
+  #errorfile 500 ${buildout:directory}/etc/nginx/errors/500.http
+  #errorfile 502 ${buildout:directory}/etc/nginx/errors/500.http
+  #errorfile 503 ${buildout:directory}/etc/nginx/errors/500.http
+  #errorfile 504 ${buildout:directory}/etc/nginx/errors/500.http
+
+frontend ${haproxy-settings:frontend}
+  bind ${hosts:haproxy}:${ports:haproxy}
+  default_backend ${haproxy-settings:backend}
+
+  capture cookie __ac len 10
+  option httplog
+
+# activate when you have configured your syslog to listen on localhost
+#  log ${hosts:syslog} local6
+
+# Load balancing over the zope instances
+backend ${haproxy-settings:backend}
+  # Use Zope's __ac cookie as a basis for session stickiness if present.
+  appsession __ac len 32 timeout 1d
+  # Otherwise add a cookie called "serverid" for maintaining session stickiness.
+  # This cookie lasts until the client's browser closes, and is invisible to Zope.
+  cookie serverid
+  # If no session found, use the roundrobin load-balancing algorithm to pick a backend.
+  balance roundrobin
+  # Use / (the default) for periodic backend health checks
+  option httpchk GET /
+
+  # Servers performs longer operations than frontend
+  timeout connect 60m
+
+  # Server options:
+  # "cookie" sets the value of the serverid cookie to be used for the server
+  # "maxconn" is how many connections can be sent to the server at once
+  # "check" enables health checks
+  # "rise 1" means consider Zope up after 1 successful health check
+  server  zope0101 ${hosts:instance}:${ports:instance} cookie z0101 check maxconn 1 maxqueue 2
+  server  zope0102 ${hosts:instance2}:${ports:instance2} cookie z0102 check maxconn 1 maxqueue 2

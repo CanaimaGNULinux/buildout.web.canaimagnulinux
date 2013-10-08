@@ -1,0 +1,39 @@
+# This file is generated from templates/logrotate.conf.
+# Please do not edit the copy in etc/
+
+rotate 4
+weekly
+create
+compress
+delaycompress
+
+# Zeo server log file
+${zeoserver:zeo-var}/log/zeoserver.log {
+    postrotate
+        /bin/kill -USR2 $(cat ${zeoserver:zeo-var}/zeoserver.pid)
+    endscript
+}
+
+# Zeo client 1 log file
+${instance:event-log} ${instance:z2-log} {
+    sharedscripts
+    postrotate
+        /bin/kill -USR2 $(cat ${instance:pid-file})
+    endscript
+}
+
+# Zeo client 2 log file
+${instance2:event-log} ${instance2:z2-log} {
+    sharedscripts
+    postrotate
+        /bin/kill -USR2 $(cat ${instance2:pid-file})
+    endscript
+}
+
+# Instance debug log file
+${instance-debug:event-log} ${instance-debug:z2-log} {
+    sharedscripts
+    postrotate
+        /bin/kill -USR2 $(cat ${instance-debug:pid-file})
+    endscript
+}

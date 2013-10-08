@@ -1,0 +1,142 @@
+# backend, ZMI instance debug.
+upstream zmi {
+    server ${hosts:instance-debug}:${ports:instance-debug};
+}
+
+# backend, Varnish cache.
+upstream varnish {
+    server ${hosts:varnish}:${ports:varnish};
+}
+
+# backend, HAProxy load haproxy.
+upstream haproxy {
+    server ${hosts:haproxy}:${ports:haproxy};
+}
+
+server {
+    listen ${ports:nginx} default;
+    server_name ${hosts:servername};
+
+    # logs
+    access_log  /var/log/nginx/${hosts:servername}.access.log;
+    error_log /var/log/nginx/${hosts:servername}.error.log;
+
+    # Tamano maximo de subida de archivos
+    client_max_body_size ${quotas:client_max_body_size};
+
+    # Tamano maximo de buffer de archivos
+    client_body_buffer_size ${quotas:client_body_buffer_size};
+
+    # habilita la compresion gzip con el cliente.
+    #gzip             on;
+    #gzip_http_version 1.1;
+
+    # See http://tumblelog.jauderho.com/post/27655495/gzip-compression-with-nginx
+    #gzip_vary on;
+
+    #MAX COMPRESSION FOR HTTP Clients!
+    #gzip_comp_level 9;
+    #gzip_min_length  512;
+    #gzip_proxied     any;
+    #gzip_types       text/plain text/html text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+
+    # make sure gzip does not lose large gzipped js or css files
+    # see http://blog.leetsoft.com/2007/7/25/nginx-gzip-ssl
+    #gzip_buffers 16 8k;
+
+    # Disable gzip for certain browsers.
+    #gzip_disable "MSIE [1-10].(?!.*SV1)";
+
+    #error_page   500 502 503 504  /500.html;
+    #location /500.html {
+    #    root ${buildout:directory}/nginx-sites/errors;
+    #}
+
+    #location /under_construction.jpg {
+    #    root ${buildout:directory}/nginx-sites/errors;
+    #    expires 30d;
+    #    add_header Cache-Control public;
+    #}
+
+    # Plone adminitration docs location
+    location ~ ^/manuales/(.*)$ {
+        alias   ${buildout:directory}/docs/_build/html/$1;
+
+        index index.html;
+    }
+
+    #Estas reglas de rewrite  deben de ir antes de "location /"" por que tienen que procesarse
+    #antes que plone
+    location ~ ^/haproxy-stats/(.*)$ {
+        rewrite ^/haproxy/(.*)$ /haproxy-stats/$1 break;
+        proxy_pass http://haproxy;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP       $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location ~ ^/haproxy-ping$ {
+        rewrite ^/haproxy/(.*)$ /haproxy-ping break;
+        proxy_pass http://haproxy;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP       $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # pagina de status
+    #location = /nginx-status {
+    #        stub_status on;
+    #        access_log off;
+    #        allow 127.0.0.1;
+    #        deny all;
+    #}
+
+    location /munin/static/ {
+        alias /etc/munin/static/;
+        expires modified +1w;
+    }
+
+    location /munin/ {
+        alias                   /var/cache/munin/www/;
+    #    autoindex               on;
+    #    auth_basic              "Access Restricted - Munin statistics website";
+    #    auth_basic_user_file    /etc/munin/munin_htpasswd
+        expires modified +310s;
+    }
+
+    # default root directory on debian based system.
+    root /var/www/nginx-default;
+    location / {
+            #proxy_pass  http://varnish/VirtualHostBase/http/canaima.softwarelibre.gob.ve:80/cms/VirtualHostRoot/;
+            #rewrite ^/(.*)$ /VirtualHostBase/http/canaima.softwarelibre.gob.ve:80/cms/VirtualHostRoot/$1 break;
+            rewrite ^/(.*)$ /VirtualHostBase/http/${site-settings:domain-name-production}:80/${site-settings:site-id}/VirtualHostRoot/$1 break;
+            proxy_read_timeout 3601;
+            proxy_connect_timeout 3601;
+            proxy_pass http://varnish;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # QA location.
+    location ~ ^/qa$ {
+            rewrite ^/qa/(.*)$ /VirtualHostBase/http/${site-settings:domain-name-production}:80/qa/${site-settings:site-id}/VirtualHostRoot/$1 break;
+            proxy_read_timeout 3601;
+            proxy_connect_timeout 3601;
+            proxy_pass http://varnish;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # ZMI from instance-debug location.
+    location ~ ^/zmi-admin/(.)$ {
+            rewrite ^/zmi-admin/(.)$ /$1 break;
+            proxy_read_timeout 3601;
+            proxy_connect_timeout 3601;
+            proxy_pass http://zmi;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

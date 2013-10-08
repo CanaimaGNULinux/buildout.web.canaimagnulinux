@@ -1,0 +1,19 @@
+[${site-settings:client-name}*]
+user ${users:munin}
+
+[nginx*]
+#env.url http://${hosts:nginx}/nginx-status
+#env.ua nginx-status-verifier/0.1
+
+[haproxy_backend]
+user ${users:munin}
+env.backend ${haproxy-settings:backend}
+env.frontend ${haproxy-settings:frontend}
+env.url http://${hosts:haproxy}:${ports:haproxy}/haproxy-stats;csv;norefresh
+env.username ${haproxy-settings:user}
+env.password ${haproxy-settings:password}
+
+[varnish_*]
+user ${users:munin}
+env.varnishstat ${munin-varnish:varnishstat}
+env.name ${site-settings:host-name}
