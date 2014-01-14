@@ -206,3 +206,9 @@ https://github.com/canaimagnulinux/buildout.web.canaimagnulinux/contributors
 
 .. _sitio Web de Canaima GNU/Linux: http://canaima.softwarelibre.gob.ve/
 .. _repositorio Canaima GNU/Linux: https://github.com/canaimagnulinux/buildout.web.canaimagnulinux
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/CanaimaGNULinux/buildout.web.canaimagnulinux/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
