@@ -190,6 +190,20 @@ Descargas
 Usted puede encontrar la versión de desarrollo del paquete ``buildout.web.canaimagnulinux``
 en el `repositorio Canaima GNU/Linux`_ en Github.com.
 
+Sobre la calidad
+================
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/CanaimaGNULinux/buildout.web.canaimagnulinux/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
+.. image:: https://travis-ci.org/CanaimaGNULinux/buildout.web.canaimagnulinux.svg?branch=master
+    :alt: Travis-CI badge
+    :target: https://travis-ci.org/CanaimaGNULinux/buildout.web.canaimagnulinux
+
+
+¿Tienes una idea?, ¿Encontraste un error? Háganos saber mediante la `apertura de un ticket de soporte`_.
+
 Autor(es) Original(es)
 ======================
 
@@ -206,9 +220,4 @@ https://github.com/canaimagnulinux/buildout.web.canaimagnulinux/contributors
 
 .. _sitio Web de Canaima GNU/Linux: http://canaima.softwarelibre.gob.ve/
 .. _repositorio Canaima GNU/Linux: https://github.com/canaimagnulinux/buildout.web.canaimagnulinux
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/CanaimaGNULinux/buildout.web.canaimagnulinux/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
-
+.. _apertura de un ticket de soporte: https://github.com/CanaimaGNULinux/buildout.web.canaimagnulinux/issues
