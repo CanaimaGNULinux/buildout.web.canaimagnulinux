@@ -56,7 +56,7 @@ Para obtener una copia de este proyecto ejecute los siguientes comandos:
 .. code-block:: console
 
   $ cd ~
-  $ git clone git@github.com:canaimagnulinux/buildout.web.canaimagnulinux.git
+  $ git clone https://github.com/CanaimaGNULinux/buildout.web.canaimagnulinux.git
 
 Puede utilizar un nombre de carpeta diferente si así lo desea.
 
