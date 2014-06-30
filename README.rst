@@ -1,6 +1,13 @@
+.. -*- coding: utf-8 -*-
+
 ===========================
 Portal de Canaima GNU/Linux
 ===========================
+
+:Framework: `Plone 4.3.3 <http://plone.org>`_
+:Bug tracker: https://github.com/CanaimaGNULinux/buildout.web.canaimagnulinux/issues
+:Source: https://github.com/CanaimaGNULinux/buildout.web.canaimagnulinux
+:Documentation: https://github.com/CanaimaGNULinux/buildout.web.canaimagnulinux/wiki/Home
 
 Este paquete instala una instancia de Plone con todos los componentes
 necesarios para construir el sitio web de Canaima GNU/Linux
