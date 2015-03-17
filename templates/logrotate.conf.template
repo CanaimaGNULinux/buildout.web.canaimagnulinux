@@ -8,32 +8,32 @@ compress
 delaycompress
 
 # Zeo server log file
-${zeoserver:zeo-var}/log/zeoserver.log {
+${buildout:var-dir}/log/zeoserver.log {
     postrotate
-        /bin/kill -USR2 $(cat ${zeoserver:zeo-var}/zeoserver.pid)
+        /bin/kill -USR2 $(cat ${buildout:var-dir}/zeoserver.pid)
     endscript
 }
 
 # Zeo client 1 log file
-${instance:event-log} ${instance:z2-log} {
+${client1:event-log} ${client1:z2-log} {
     sharedscripts
     postrotate
-        /bin/kill -USR2 $(cat ${instance:pid-file})
+        /bin/kill -USR2 $(cat ${client1:pid-file})
     endscript
 }
 
 # Zeo client 2 log file
-${instance2:event-log} ${instance2:z2-log} {
+${client2:event-log} ${client2:z2-log} {
     sharedscripts
     postrotate
-        /bin/kill -USR2 $(cat ${instance2:pid-file})
+        /bin/kill -USR2 $(cat ${client2:pid-file})
     endscript
 }
 
 # Instance debug log file
-${instance-debug:event-log} ${instance-debug:z2-log} {
+${client-debug:event-log} ${client-debug:z2-log} {
     sharedscripts
     postrotate
-        /bin/kill -USR2 $(cat ${instance-debug:pid-file})
+        /bin/kill -USR2 $(cat ${client-debug:pid-file})
     endscript
 }

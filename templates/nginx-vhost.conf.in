@@ -1,6 +1,6 @@
 # backend, ZMI instance debug.
 upstream zmi {
-    server ${hosts:instance-debug}:${ports:instance-debug};
+    server ${hosts:client-debug}:${ports:client-debug};
 }
 
 # backend, Varnish cache.
@@ -58,8 +58,8 @@ server {
     #    add_header Cache-Control public;
     #}
 
-    # Plone adminitration docs location
-    location ~ ^/manuales/(.*)$ {
+    # Adminitration docs location
+    location ~ ^/docs/(.*)$ {
         alias   ${buildout:directory}/docs/_build/html/$1;
 
         index index.html;
@@ -118,18 +118,7 @@ server {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    # QA location.
-    location ~ ^/qa$ {
-            rewrite ^/qa/(.*)$ /VirtualHostBase/http/${site-settings:domain-name-production}:80/qa/${site-settings:site-id}/VirtualHostRoot/$1 break;
-            proxy_read_timeout 3601;
-            proxy_connect_timeout 3601;
-            proxy_pass http://varnish;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-
-    # ZMI from instance-debug location.
+    # ZMI from client-debug location.
     location ~ ^/zmi-admin/(.)$ {
             rewrite ^/zmi-admin/(.)$ /$1 break;
             proxy_read_timeout 3601;

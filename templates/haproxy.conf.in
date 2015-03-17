@@ -6,7 +6,7 @@ global
   log ${hosts:syslog} local6
 
   # We manage this with supervisor
-  #  user ${users:zope}
+  #  user ${site-settings:user-server}
 
   maxconn  ${haproxy-settings:maxconn}
   ulimit-n ${haproxy-settings:ulimit-n}
@@ -20,7 +20,7 @@ defaults
   log global
   mode http
 
-  # The zope instances have maxconn 1, and it is important that
+  # The zeo clients have maxconn 1, and it is important that
   # unused/idle connections are closed as soon as possible.
   option httpclose
 
@@ -65,7 +65,7 @@ frontend ${haproxy-settings:frontend}
 # activate when you have configured your syslog to listen on localhost
 #  log ${hosts:syslog} local6
 
-# Load balancing over the zope instances
+# Load balancing over the zeo clients
 backend ${haproxy-settings:backend}
   # Use Zope's __ac cookie as a basis for session stickiness if present.
   appsession __ac len 32 timeout 1d
@@ -85,5 +85,5 @@ backend ${haproxy-settings:backend}
   # "maxconn" is how many connections can be sent to the server at once
   # "check" enables health checks
   # "rise 1" means consider Zope up after 1 successful health check
-  server  zope0101 ${hosts:instance}:${ports:instance} cookie z0101 check maxconn 1 maxqueue 2
-  server  zope0102 ${hosts:instance2}:${ports:instance2} cookie z0102 check maxconn 1 maxqueue 2
+  server  zope0101 ${hosts:client1}:${ports:client1} cookie z0101 check maxconn 1 maxqueue 2
+  server  zope0102 ${hosts:client2}:${ports:client2} cookie z0102 check maxconn 1 maxqueue 2
