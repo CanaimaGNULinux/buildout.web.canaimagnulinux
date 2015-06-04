@@ -115,19 +115,20 @@ obtenidas tras la descarga previa realizada en la sección llamada
       llamado ``nginx_memory`` para monitorear el consumo de memoria de 
       :ref:`Nginx <nginx_setup>`.
 
-   ``buildout.d/sources.cfg``
+   ``buildout.d/checkouts.cfg``
       Esta configuración zc.buildout define los recursos de paquetes eggs en desarrollo 
       que se agregaran al proyecto usando la extensión de zc.buildout llamada ``mr.developer``.
       Esta especifica los nombres de los paquetes los cuales deben ser comprobados durante 
       la ejecución del buildout, los paquetes ya comprobados son esquivados. Usted puede usar * 
       como un comodín para todos los paquetes en la sección ``[sources]``.
 
-   ``buildout.d/checkouts.cfg``
-      Esta configuración zc.buildout le permite ejecutar el proceso de construcción de Plone 
-      paso a paso para depurar posibles fallas en el proceso de construcción de la herramienta.
+   ``buildout.d/sources.cfg``
+      Esta configuración zc.buildout le permite definir los origenes de paquetes Egg 
+      a usar, los cuales se define en la sección ``[sources].
 
    ``buildout.d/maintenance.cfg``
-      Esta configuración zc.buildout le permite definir tareas de actualización y mantenimiento de Plone.
+      Esta configuración zc.buildout le permite definir tareas de actualización y 
+      mantenimiento de Plone.
 
 ----
 
