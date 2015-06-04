@@ -1,0 +1,33 @@
+#!/bin/bash
+
+echo "Actualizando las configuraciones del servidor Nginx y servicio Munin"
+
+# copio la configuración de nginx.
+sudo cp ${nginx-config:output} /etc/nginx/nginx.conf
+
+# copio la configuración autogenerada del virtualhost para nginx.
+sudo cp ${nginx-vhost-conf:output} /etc/nginx/sites-available/${site-settings:client-name}.vhost.conf
+# activo el virtual host.
+sudo ln -sf /etc/nginx/sites-available/${site-settings:client-name}.vhost.conf /etc/nginx/sites-enabled/default
+
+# reinicio para cargar los cambios.
+sudo service nginx restart
+
+# copio la configuración de los plugins de munin.
+sudo cp ${munin-plugin-config:output} /etc/munin/plugin-conf.d/munin-plugin-${site-settings:client-name}.conf
+
+# habilito los plugins de munin
+#pushd /etc/munin
+#pushd plugins
+#for plugin in $(ls ${buildout:bin-directory}/{haproxy,nginx,${site-settings:client-name}}_*)
+#do
+#    sudo ln -fs $plugin
+#done
+#popd
+#pushd plugin-conf.d
+#cat ${munin-plugin-config:output} | sudo tee -a munin-node
+#popd
+#popd
+
+# reinicio munin-node
+sudo service munin-node restart

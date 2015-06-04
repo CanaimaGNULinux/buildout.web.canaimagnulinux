@@ -1,0 +1,124 @@
+# This is a basic VCL configuration file for varnish.  See the vcl(7)
+# man page for details on VCL syntax and semantics.
+
+/* HAProxy backend */
+backend haproxy {
+    .host = "${hosts:haproxy}";
+    .port = "${ports:haproxy}";
+    .connect_timeout = 0.4s;
+    #.first_byte_timeout = 300s;
+    .first_byte_timeout = 8600s;
+    .between_bytes_timeout = 60s;
+}
+
+acl purge {
+    "localhost";
+    "${site-settings:localhost}";
+}
+
+sub annotate_request {
+    if (!(req.http.Authorization || req.http.cookie ~ "(^|.*; )__ac=")) {
+        set req.http.X-Anonymous = "True";
+    }
+}
+
+sub vcl_recv {
+    set req.grace = 120s;
+    set req.backend = haproxy;
+    
+    if (req.request == "PURGE") {
+        if (!client.ip ~ purge) {
+            error 405 "Not allowed.";
+        }
+        return(lookup);
+    }
+
+    if (req.request != "GET" &&
+        req.request != "HEAD" &&
+        req.request != "PUT" &&
+        req.request != "POST" &&
+        req.request != "TRACE" &&
+        req.request != "OPTIONS" &&
+        req.request != "DELETE") {
+        /* Non-RFC2616 or CONNECT which is weird. */
+        return(pipe);
+    }
+
+    if (req.request != "GET" && req.request != "HEAD") {
+        /* We only deal with GET and HEAD by default */
+        return(pass);
+    }
+
+    if (req.url ~ "createObject") {
+        return(pass);
+    }
+    
+    call annotate_request;
+    
+    return(lookup);
+}
+
+sub vcl_hit {
+    if (req.request == "PURGE") {
+        purge_url(req.url);
+        error 200 "Purged";
+    }
+
+    if (!obj.cacheable) {
+        return(pass);
+    }
+}
+
+sub vcl_miss {
+    if (req.request == "PURGE") {
+        error 404 "Not in cache";
+    }
+
+}
+
+sub vcl_fetch {
+    set beresp.grace = 120s;
+    if (!beresp.cacheable) {
+        return(pass);
+    }
+    if (beresp.http.Set-Cookie) {
+        return(pass);
+    }
+    if (beresp.http.Cache-Control ~ "(private|no-cache|no-store)") {
+        return(pass);
+    }
+    if (req.http.Authorization && !beresp.http.Cache-Control ~ "public") {
+        return(pass);
+    }
+}
+
+sub vcl_deliver {
+  # rewrite s-maxage so intermediary proxies don't use it
+  if (resp.http.Cache-Control ~ "s-maxage") {
+    set resp.http.Cache-Control = regsub(resp.http.Cache-Control, "s-maxage=[0-9]+", "s-maxage=0");
+  }
+
+}
+
+sub vcl_error {
+    set obj.http.Content-Type = "text/html; charset=utf-8";
+    synthetic {"
+ <?xml version="1.0" encoding="utf-8"?>
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+ <html>
+   <head>
+     <title>"} obj.status " " obj.response {"</title>
+   </head>
+   <body>
+     <h1>Error "} obj.status " " obj.response {"</h1>
+     <p>"} obj.response {"</p>
+     <h3>Guru Meditation:</h3>
+     <p>XID: "} req.xid {"</p>
+     <hr>
+     <p>Varnish cache server</p>
+   </body>
+ </html>
+ "};
+    return(deliver);
+}
