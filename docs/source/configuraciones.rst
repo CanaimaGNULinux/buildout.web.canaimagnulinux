@@ -63,7 +63,7 @@ obtenidas tras la descarga previa realizada en la sección llamada
       y ensamblar la Plone con el conjunto de servicios necesario para que esta 
       funcione bajo un esquema de alta disponibilidad.
 
-   ``buildout.d/production-kgv.cfg``
+   ``buildout.d/production-versions.cfg``
       Esta configuración zc.buildout se extiende de la configuración ``production.cfg``,
       la cual define el conjunto de versiones de paquetes a usar para la construcción.
 
